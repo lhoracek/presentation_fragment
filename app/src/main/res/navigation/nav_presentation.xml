@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_presentation"
+    app:startDestination="@id/dest_prstMainFragment">
+
+    <fragment
+        android:id="@+id/dest_prstMainFragment"
+        android:name="cz.lhoracek.presentation.PrstMainFragment"
+        android:label="PrstMainFragment" />
+    <fragment
+        android:id="@+id/dest_prstSecondFragment"
+        android:name="cz.lhoracek.presentation.PrstSecondFragment"
+        android:label="PrstSecondFragment" />
+</navigation>
