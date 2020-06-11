@@ -35,15 +35,20 @@ class MainActivity : DaggerAppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
-        val mgr = applicationContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val displays = mgr.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)
-        val display = displays[0]
+        if(!presentationViewModel.displayed) {
+            val mgr = applicationContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            val displays = mgr.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)
+            val display = displays[0]
 
-        val preso = SamplePresentationFragment.newInstance(this, display)
-        preso.show(supportFragmentManager, "preso");
+            val preso = SamplePresentationFragment.newInstance(this, display)
+            preso.show(supportFragmentManager, "preso");
+
+            presentationViewModel.displayed = true
+        }
 
         viewModel.navigate.observe(this, Observer {
             startActivity(Intent(this, it))
+            finish()
         })
     }
 

@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
@@ -26,6 +27,7 @@ import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import dagger.android.support.AndroidSupportInjection
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,8 +55,10 @@ class SamplePresentationFragment : PresentationFragment(), HasAndroidInjector {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.destination.observe(this, Observer { Navigation.findNavController(binding.root.findViewById(R.id.nav_host_fragment)).navigate(it.id) })
-
+        Transformations.distinctUntilChanged(viewModel.destination).observe(this, Observer {
+            Navigation.findNavController(binding.root.findViewById(R.id.nav_host_fragment)).navigate(it.id)
+            Timber.d("Presentation thinks activity is $activity")
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,6 +81,7 @@ class SamplePresentationFragment : PresentationFragment(), HasAndroidInjector {
 @Singleton
 class PresentationViewModel @Inject constructor(): ViewModel() {
     val destination = MutableLiveData<Destination>()
+    var displayed = false
 }
 
 

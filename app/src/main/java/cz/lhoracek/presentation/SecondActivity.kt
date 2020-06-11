@@ -1,9 +1,16 @@
 package cz.lhoracek.presentation
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import cz.lhoracek.presentation.databinding.ActivityMainBinding
+import cz.lhoracek.presentation.databinding.ActivitySecondBinding
 import cz.lhoracek.presentation.di.ActivityScope
 import dagger.Binds
 import dagger.Module
@@ -20,22 +27,29 @@ class SecondActivity : DaggerAppCompatActivity() {
     }
 
     @Inject
+    lateinit var viewModel: SecondViewModel
+    @Inject
     lateinit var presentationViewModel: PresentationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_second)
+        val binding = DataBindingUtil.setContentView<ActivitySecondBinding>(this, R.layout.activity_second)
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
 
-        val mgr = applicationContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val displays = mgr.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)
-        val display = displays[0]
-
-        val preso = SamplePresentationFragment.newInstance(this, display)
-        preso.show(getSupportFragmentManager(), "preso");
+        viewModel.navigate.observe(this, Observer {
+            startActivity(Intent(this, it))
+            finish()
+        })
     }
 
     override fun onResume() {
         super.onResume()
         presentationViewModel.destination.value = Destination.SECOND
     }
+}
+
+class SecondViewModel @Inject constructor() : ViewModel() {
+    val navigate = SingleLiveEvent<Class<out Activity>>()
+    val clickhandler = { navigate.value = MainActivity::class.java }
 }
